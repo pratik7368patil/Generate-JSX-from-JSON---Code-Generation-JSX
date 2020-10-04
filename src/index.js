@@ -10,13 +10,13 @@ function generateJSX(obj) {
     let styleIterator = Object.keys(obj.style);
     res += "style={{";
     for (let i = 0; i < styleIterator.length; i++) {
-      res += `${styleIterator[i]} : ${obj.style[styleIterator[i]]}`;
+      res += `${styleIterator[i]} : ${obj.style[styleIterator[i]]};`;
     }
     res += "}}";
   }
 
   if (obj.children !== undefined && obj.children.length > 0) {
-    res += ">";
+    res += ">\n";
     for (let i = 0; i < obj.children.length; i++) {
       res += generateJSX(obj.children[i]);
     }
