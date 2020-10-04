@@ -2,6 +2,25 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./components/App";
 
+function convertProp(prop) {
+  if (prop.indexOf("-") !== -1) {
+    let res = prop
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.substr(1))
+      .join("");
+    res = res.charAt(0).toLowerCase() + res.substr(1);
+    return res;
+  }
+  return prop;
+}
+
+function convertPropKey(key) {
+  if (!isNaN(key)) {
+    return key;
+  }
+  return `"${key}"`;
+}
+
 function generateJSX(obj) {
   let res = "<";
   res += obj.name + " ";
@@ -10,8 +29,11 @@ function generateJSX(obj) {
     let styleIterator = Object.keys(obj.style);
     res += "style={{";
     for (let i = 0; i < styleIterator.length; i++) {
-      res += `${styleIterator[i]} : ${obj.style[styleIterator[i]]};`;
+      res += `${convertProp(styleIterator[i])} : ${convertPropKey(
+        obj.style[styleIterator[i]]
+      )},`;
     }
+    res = res.slice(0, -1);
     res += "}}";
   }
 
@@ -22,7 +44,7 @@ function generateJSX(obj) {
     }
     res += `</${obj.name}>`;
   } else {
-    res += "/>";
+    res += "/> \n";
   }
 
   return res;
