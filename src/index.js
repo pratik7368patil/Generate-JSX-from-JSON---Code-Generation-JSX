@@ -2,56 +2,53 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./components/App";
 
-function convertProp(prop) {
-  if (prop.indexOf("-") !== -1) {
-    let res = prop
+function convertToCamelCase(val) {
+  //console.log(val);
+  if (val.indexOf("-") != -1) {
+    let key = val
       .split("-")
-      .map((w) => w.charAt(0).toUpperCase() + w.substr(1))
+      .map((w) => w.charAt(0).toUpperCase() + w.substring(1))
       .join("");
-    res = res.charAt(0).toLowerCase() + res.substr(1);
-    return res;
-  }
-  return prop;
-}
-
-function convertPropKey(key) {
-  if (!isNaN(key)) {
+    //console.log(key);
+    key = key.charAt(0).toLowerCase() + key.substring(1);
     return key;
   }
-  return `"${key}"`;
+  return val;
 }
 
-function generateJSX(obj) {
-  let res = "<";
-  res += obj.name + " ";
-
-  if (obj.style !== undefined && Object.keys(obj.style).length > 0) {
-    let styleIterator = Object.keys(obj.style);
-    res += "style={{";
-    for (let i = 0; i < styleIterator.length; i++) {
-      res += `${convertProp(styleIterator[i])} : ${convertPropKey(
-        obj.style[styleIterator[i]]
-      )},`;
-    }
-    res = res.slice(0, -1);
-    res += "}}";
+function validateType(val) {
+  if (!isNaN(val)) {
+    return val;
   }
-
-  if (obj.children !== undefined && obj.children.length > 0) {
-    res += ">\n";
-    for (let i = 0; i < obj.children.length; i++) {
-      res += generateJSX(obj.children[i]);
-    }
-    res += `</${obj.name}>`;
-  } else {
-    res += "/> \n";
-  }
-
-  return res;
+  return `"${val}"`;
 }
 
 function generateCodeFromObject(obj) {
-  return generateJSX(obj);
+  let el = "<";
+  el += obj.name;
+  if (obj.style !== undefined && Object.keys(obj.style).length > 0) {
+    let styles = Object.keys(obj.style);
+    el += " style={{";
+    for (let i = 0; i < styles.length; i++) {
+      el += `${convertToCamelCase(styles[i])} : ${validateType(
+        obj.style[styles[i]]
+      )}`;
+      if (i <= styles.length - 2) {
+        el += ",";
+      }
+    }
+    el += "}}";
+  }
+  if (obj.children !== undefined && obj.children.length > 0) {
+    el += ">\n";
+    for (let i = 0; i < obj.children.length; i++) {
+      el += generateCodeFromObject(obj.children[i]);
+    }
+    el += "</" + obj.name + ">\n";
+  } else {
+    el += "/>\n";
+  }
+  return el;
 }
 
 module.exports = generateCodeFromObject;
